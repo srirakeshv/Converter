@@ -1,9 +1,9 @@
 import React from "react";
-import UnsplashImages from "../../Components/Common/UnsplashImages";
+import UnsplashImages from "../../Components/Home/UnsplashImages";
 
 const Homepage = () => {
   return (
-    <div>
+    <div className="bg-sky-950" style={{ minHeight: "100vh" }}>
       <UnsplashImages />
     </div>
   );
