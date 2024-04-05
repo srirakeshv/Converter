@@ -1,10 +1,10 @@
 import React from "react";
-import Navbar from "../../Components/Common/Navbar";
+import UnsplashImages from "../../Components/Common/UnsplashImages";
 
 const Homepage = () => {
   return (
     <div>
-      <Navbar />
+      <UnsplashImages />
     </div>
   );
 };
