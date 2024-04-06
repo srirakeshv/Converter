@@ -3,6 +3,10 @@ import "tailwindcss/tailwind.css";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CloseIcon from "@mui/icons-material/Close";
+import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded";
+import ImageOverlay from "./ImageOverlay";
 
 const UnsplashImages = () => {
   const [images, setImages] = useState([]); //setting an updating the api array of images
@@ -13,6 +17,7 @@ const UnsplashImages = () => {
   const [searchActive, setSearchActive] = useState(false); //searchbar active status
   const [maxImage, setMaxImage] = useState(""); //showing images of onclicked image in max view
   const [arrowActive, setArrowActive] = useState(false); //arrow setting dropdown menu
+  const [hover, setHover] = useState(null); //setting hover status for images
 
   //fetching api for images
   useEffect(() => {
@@ -27,7 +32,7 @@ const UnsplashImages = () => {
         }
 
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         setImages(data.results);
         setTotalNumber(data.total_pages);
       } catch (error) {
@@ -64,15 +69,22 @@ const UnsplashImages = () => {
     }
   };
 
+  //imageclick
   const imageClick = (image) => {
     setBlurActive(true);
     setMaxImage(image);
   };
 
+  //collection click
+  const handleCollection = () => {
+    setBlurActive(false);
+    console.log("collection");
+  };
+
   return (
     <div
       className="flex flex-col items-center justify-center font-Tilt-Neon"
-      style={{ minHeight: "100vh" }}
+      style={{ minHeight: "80vh" }}
       onClick={() => setSearchActive(false)}
     >
       <form className="max-w-7xl w-full my-3 relative">
@@ -92,14 +104,32 @@ const UnsplashImages = () => {
           />
         )}
       </form>
-      <div className="max-w-7xl w-full flex gap-5 justify-center flex-wrap cursor-pointer">
+      <div className="max-w-7xl w-full flex gap-5 justify-center flex-wrap">
         {images.map((image) => (
-          <img
-            key={image.id}
-            src={image.urls.small}
-            alt={image.alt_description}
-            onClick={() => imageClick(image)}
-          />
+          <div className="relative cursor-pointer">
+            <img
+              key={image.id}
+              src={image.urls.small}
+              alt={image.alt_description}
+              onClick={() => imageClick(image)}
+              onMouseEnter={() => setHover(image.id)}
+              onMouseLeave={() => setHover(null)}
+              className="w-full h-full"
+            />
+            {hover === image.id && (
+              <ImageOverlay image={image} handleCollection={handleCollection} />
+            )}
+            {/* <div
+              className={`flex items-center justify-center rounded-full w-40 text-white absolute bottom-2 right-2 ${
+                hover === image.id ? "" : "hidden"
+              }`}
+              style={{ backgroundColor: "#048369" }}
+            >
+              <p className="p-3 flex gap-2 items-center justify-center">
+                Download <FileDownloadRoundedIcon />
+              </p>
+            </div> */}
+          </div>
         ))}
       </div>
       <div className="flex gap-2">
@@ -108,10 +138,16 @@ const UnsplashImages = () => {
       </div>
       {blurActive && (
         <div
-          className="w-full h-full fixed top-0 right-0 z-10 py-5 flex justify-center"
+          className="w-full h-full fixed top-0 right-0 z-10 py-5 flex flex-col items-center"
           style={{ backgroundColor: "rgba(109, 107, 107, 0.219)" }}
-          onClick={() => setBlurActive(false)}
         >
+          <div className="max-w-5xl w-full flex justify-end">
+            <CloseIcon
+              className="cursor-pointer"
+              sx={{ fontSize: "40px", color: "white" }}
+              onClick={() => setBlurActive(false)}
+            />
+          </div>
           <div className="bg-white max-w-5xl w-full rounded-xl h-full p-3 flex justify-between">
             <div className="">
               <img
