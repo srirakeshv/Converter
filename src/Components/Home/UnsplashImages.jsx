@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import "tailwindcss/tailwind.css";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import CloseIcon from "@mui/icons-material/Close";
-import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded";
-import ImageOverlay from "./ImageOverlay";
+import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
+import CloseIcon from "@mui/icons-material/Close";
+import ImageOverlay from "./ImageOverlay"; //hover image component
+import gsap from "gsap";
+import "../Home/Css/UnsplashImage.css";
 
 const UnsplashImages = () => {
   const [images, setImages] = useState([]); //setting an updating the api array of images
@@ -18,6 +19,7 @@ const UnsplashImages = () => {
   const [maxImage, setMaxImage] = useState(""); //showing images of onclicked image in max view
   const [arrowActive, setArrowActive] = useState(false); //arrow setting dropdown menu
   const [hover, setHover] = useState(null); //setting hover status for images
+  const [zoom, setZoom] = useState(false); //setting zoom images
 
   //fetching api for images
   useEffect(() => {
@@ -32,7 +34,7 @@ const UnsplashImages = () => {
         }
 
         const data = await response.json();
-        // console.log(data);
+        console.log(data);
         setImages(data.results);
         setTotalNumber(data.total_pages);
       } catch (error) {
@@ -81,11 +83,23 @@ const UnsplashImages = () => {
     console.log("collection");
   };
 
+  useEffect(() => {
+    setSearchActive(input.length === 0 ? false : true);
+  }, [searchActive, input]);
+
+  //tracing arrow active gsap animation
+  useEffect(() => {
+    if (arrowActive) {
+      gsap.to(".arrowIcon", { rotation: 180, duration: 0.5 });
+    } else {
+      gsap.to(".arrowIcon", { rotation: 0, duration: 0.5 });
+    }
+  }, [arrowActive]);
+
   return (
     <div
-      className="flex flex-col items-center justify-center font-Tilt-Neon"
+      className="flex flex-col items-center justify-center font-Tilt-Neon px-3"
       style={{ minHeight: "80vh" }}
-      onClick={() => setSearchActive(false)}
     >
       <form className="max-w-7xl w-full my-3 relative">
         <input
@@ -106,29 +120,21 @@ const UnsplashImages = () => {
       </form>
       <div className="max-w-7xl w-full flex gap-5 justify-center flex-wrap">
         {images.map((image) => (
-          <div className="relative cursor-pointer">
-            <img
-              key={image.id}
-              src={image.urls.small}
-              alt={image.alt_description}
-              onClick={() => imageClick(image)}
-              onMouseEnter={() => setHover(image.id)}
-              onMouseLeave={() => setHover(null)}
-              className="w-full h-full"
-            />
+          <div className="relative">
+            <a href={image.urls.small} onClick={(e) => e.preventDefault()}>
+              <img
+                key={image.id}
+                src={image.urls.small}
+                alt={image.alt_description}
+                onClick={() => imageClick(image)}
+                onMouseEnter={() => setHover(image.id)}
+                onMouseLeave={() => setHover(null)}
+                className="w-full h-full cursor-pointer"
+              />
+            </a>
             {hover === image.id && (
-              <ImageOverlay image={image} handleCollection={handleCollection} />
+              <ImageOverlay handleCollection={handleCollection} />
             )}
-            {/* <div
-              className={`flex items-center justify-center rounded-full w-40 text-white absolute bottom-2 right-2 ${
-                hover === image.id ? "" : "hidden"
-              }`}
-              style={{ backgroundColor: "#048369" }}
-            >
-              <p className="p-3 flex gap-2 items-center justify-center">
-                Download <FileDownloadRoundedIcon />
-              </p>
-            </div> */}
           </div>
         ))}
       </div>
@@ -138,37 +144,56 @@ const UnsplashImages = () => {
       </div>
       {blurActive && (
         <div
-          className="w-full h-full fixed top-0 right-0 z-10 py-5 flex flex-col items-center"
+          className="w-full h-full fixed top-0 right-0 left-0 bottom-0 py-5 flex flex-col items-center overflow-y-auto hide-scrollbar"
           style={{ backgroundColor: "rgba(109, 107, 107, 0.219)" }}
         >
           <div className="max-w-5xl w-full flex justify-end">
             <CloseIcon
               className="cursor-pointer"
               sx={{ fontSize: "40px", color: "white" }}
-              onClick={() => setBlurActive(false)}
+              onClick={() => {
+                setZoom(false);
+                setBlurActive(false);
+              }}
             />
           </div>
-          <div className="bg-white max-w-5xl w-full rounded-xl h-full p-3 flex justify-between">
-            <div className="">
-              <img
-                src={maxImage.urls.small}
-                alt=""
-                className="rounded-lg max-h-[85vh]"
-              />
-            </div>
-            <div>
+          <div className="bg-white max-w-5xl w-full rounded-xl h-fit p-3 flex flex-col gap-3">
+            <div className="flex gap-2 items-start">
+              <button
+                className="flex items-center gap-2 rounded-md border-gray-400 p-3"
+                style={{ borderWidth: "0.1px" }}
+              >
+                Collect <BookmarksOutlinedIcon />
+              </button>
+              <button
+                className="flex items-center gap-2 rounded-md border-gray-400 p-3 text-lg"
+                style={{ borderWidth: "0.1px" }}
+              >
+                Likes <FavoriteBorderOutlinedIcon />
+              </button>
               <div
                 className="flex items-center justify-between rounded-md w-52 text-white"
                 style={{ backgroundColor: "#05A081" }}
               >
                 <p className="p-3">Free Download</p>
                 <hr className="w-[1px] h-8 bg-black text-black" />
-                <div className="p-3" onClick={() => setArrowActive(true)}>
-                  <KeyboardArrowDownIcon
-                    className={`${arrowActive ? "rotate-180" : " "}`}
-                  />
+                <div
+                  className="p-3 arrowIcon"
+                  onClick={() => setArrowActive(!arrowActive)}
+                >
+                  <KeyboardArrowDownIcon />
                 </div>
               </div>
+            </div>
+            <div className="self-center">
+              <img
+                src={maxImage.urls.full}
+                alt=""
+                className={`rounded-lg max-h-[85vh] ${
+                  zoom ? "cursor-zoom-out" : "cursor-zoom-in"
+                }`}
+                onClick={() => setZoom(!zoom)}
+              />
             </div>
           </div>
         </div>

@@ -1,25 +1,47 @@
 import React from "react";
 import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded";
 
 // Define the ImageOverlay component
-const ImageOverlay = ({ image, handleCollection }) => (
-  <div className="absolute top-0 left-0 w-full h-full flex justify-end items-start pointer-events-none">
-    <div className="flex gap-2">
-      <div
-        className="w-10 h-10 rounded-full bg-gray-300 flex justify-center items-center"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleCollection();
-        }}
-      >
-        <BookmarksOutlinedIcon />
+const ImageOverlay = ({ handleCollection }) => {
+  return (
+    <div
+      className="p-2 absolute top-0 right-0 w-full h-full flex flex-col justify-between items-end pointer-events-none"
+      style={{ zIndex: "999" }}
+    >
+      <div className="flex gap-2">
+        <div
+          className="clickable-button"
+          onClick={(e) => {
+            // Prevent the click event from propagating to the image
+            e.stopPropagation();
+          }}
+        >
+          <button
+            className="clickable-button w-10 h-10 rounded-lg bg-white flex justify-center items-center cursor-default"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCollection();
+            }}
+          >
+            <BookmarksOutlinedIcon />
+          </button>
+        </div>
+        <button className="w-10 h-10 rounded-lg bg-white flex justify-center items-center">
+          <FavoriteBorderOutlinedIcon />
+        </button>
       </div>
-      <div className="w-10 h-10 rounded-full bg-gray-300 flex justify-center items-center">
-        <FavoriteBorderOutlinedIcon />
+      <div
+        className={`flex items-center justify-center rounded-full w-40 text-white`}
+        style={{ backgroundColor: "#048369" }}
+      >
+        <button className="p-3 flex gap-2 items-center justify-center">
+          Download <FileDownloadRoundedIcon />
+        </button>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default ImageOverlay;

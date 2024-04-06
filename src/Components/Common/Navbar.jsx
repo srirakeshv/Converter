@@ -3,7 +3,7 @@ import "tailwindcss/tailwind.css";
 
 const Navbar = () => {
   return (
-    <nav className="flex justify-center font-Tilt-Neon">
+    <nav className="flex justify-center font-Tilt-Neon px-3">
       <div className="max-w-7xl w-full flex justify-between items-center">
         <div className="w-44">
           <img
