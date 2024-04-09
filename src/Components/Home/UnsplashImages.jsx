@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import "tailwindcss/tailwind.css";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -8,6 +8,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import ImageOverlay from "./ImageOverlay"; //hover image component
 import gsap from "gsap";
 import "../Home/Css/UnsplashImage.css";
+import Skeleton from "@mui/material/Skeleton";
+
+const LazyImage = lazy(() => import("./LazyImage"));
 
 const UnsplashImages = () => {
   const [images, setImages] = useState([]); //setting an updating the api array of images
@@ -20,6 +23,7 @@ const UnsplashImages = () => {
   const [arrowActive, setArrowActive] = useState(false); //arrow setting dropdown menu
   const [hover, setHover] = useState(null); //setting hover status for images
   const [zoom, setZoom] = useState(false); //setting zoom images
+  const [isLoading, setIsLoading] = useState(true); //setting skeleton before image load
 
   //fetching api for images
   useEffect(() => {
@@ -73,6 +77,8 @@ const UnsplashImages = () => {
 
   //imageclick
   const imageClick = (image) => {
+    const img = new Image();
+    img.src = image.urls.full; // Preload the full-sized image
     setBlurActive(true);
     setMaxImage(image);
   };
@@ -120,18 +126,23 @@ const UnsplashImages = () => {
       </form>
       <div className="max-w-7xl w-full flex gap-5 justify-center flex-wrap">
         {images.map((image) => (
-          <div className="relative">
-            <a href={image.urls.small} onClick={(e) => e.preventDefault()}>
-              <img
-                key={image.id}
-                src={image.urls.small}
-                alt={image.alt_description}
-                onClick={() => imageClick(image)}
-                onMouseEnter={() => setHover(image.id)}
-                onMouseLeave={() => setHover(null)}
-                className="w-full h-full cursor-pointer"
-              />
-            </a>
+          <div
+            className="relative w-40 sx:w-44 mdd:w-60 lg:w-80 xl:w-96"
+            key={image.id}
+          >
+            <Suspense fallback={<div>Loading...</div>}>
+              <a href={image.urls.small} onClick={(e) => e.preventDefault()}>
+                <LazyImage
+                  key={image.id}
+                  src={image.urls.small}
+                  alt={image.alt_description}
+                  onClick={() => imageClick(image)}
+                  onMouseEnter={() => setHover(image.id)}
+                  onMouseLeave={() => setHover(null)}
+                  className="w-full h-full cursor-pointer"
+                />
+              </a>
+            </Suspense>
             {hover === image.id && (
               <ImageOverlay handleCollection={handleCollection} />
             )}
@@ -144,7 +155,7 @@ const UnsplashImages = () => {
       </div>
       {blurActive && (
         <div
-          className="w-full h-full fixed top-0 right-0 left-0 bottom-0 py-5 flex flex-col items-center overflow-y-auto hide-scrollbar"
+          className="w-full h-full fixed top-0 right-0 left-0 bottom-0 py-5 px-2 flex flex-col items-center overflow-y-auto hide-scrollbar"
           style={{ backgroundColor: "rgba(109, 107, 107, 0.219)" }}
         >
           <div className="max-w-5xl w-full flex justify-end">
@@ -154,6 +165,7 @@ const UnsplashImages = () => {
               onClick={() => {
                 setZoom(false);
                 setBlurActive(false);
+                setIsLoading(true);
               }}
             />
           </div>
@@ -179,21 +191,37 @@ const UnsplashImages = () => {
                 <hr className="w-[1px] h-8 bg-black text-black" />
                 <div
                   className="p-3 arrowIcon"
-                  onClick={() => setArrowActive(!arrowActive)}
+                  onClick={() => {
+                    setArrowActive(!arrowActive);
+                  }}
                 >
                   <KeyboardArrowDownIcon />
                 </div>
               </div>
             </div>
-            <div className="self-center">
-              <img
-                src={maxImage.urls.full}
-                alt=""
-                className={`rounded-lg max-h-[85vh] ${
-                  zoom ? "cursor-zoom-out" : "cursor-zoom-in"
-                }`}
-                onClick={() => setZoom(!zoom)}
-              />
+            <div className="self-center" key={maxImage.id}>
+              <Suspense fallback={<div>Loading...</div>}>
+                {isLoading && (
+                  <Skeleton
+                    variant="rectangular"
+                    width={700}
+                    height={500}
+                    animation="wave"
+                    className="rounded-md"
+                  />
+                )}
+                <img
+                  src={maxImage.urls.full}
+                  alt=""
+                  className={`rounded-lg max-h-[85vh] ${
+                    zoom ? "cursor-zoom-out" : "cursor-zoom-in"
+                  } ${isLoading ? "" : "block"}`}
+                  onClick={() => setZoom(!zoom)}
+                  onLoad={() => {
+                    setIsLoading(false);
+                  }}
+                />
+              </Suspense>
             </div>
           </div>
         </div>

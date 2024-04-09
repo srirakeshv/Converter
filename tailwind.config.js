@@ -6,6 +6,10 @@ module.exports = {
       fontFamily: {
         "Tilt-Neon": ["Tilt Neon", "sans-serif"],
       },
+      screens: {
+        sx: "450px",
+        mdd: "770px",
+      },
     },
   },
   plugins: [],

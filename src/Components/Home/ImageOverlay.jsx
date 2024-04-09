@@ -6,10 +6,7 @@ import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded";
 // Define the ImageOverlay component
 const ImageOverlay = ({ handleCollection }) => {
   return (
-    <div
-      className="p-2 absolute top-0 right-0 w-full h-full flex flex-col justify-between items-end pointer-events-none"
-      style={{ zIndex: "999" }}
-    >
+    <div className="p-2 absolute top-0 right-0 w-full h-full flex flex-col justify-between items-end pointer-events-none">
       <div className="flex gap-2">
         <div
           className="clickable-button"
