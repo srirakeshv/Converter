@@ -3,12 +3,16 @@ import "tailwindcss/tailwind.css";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
+import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import CloseIcon from "@mui/icons-material/Close";
 import ImageOverlay from "./ImageOverlay"; //hover image component
 import gsap from "gsap";
 import "../Home/Css/UnsplashImage.css";
 import Skeleton from "@mui/material/Skeleton";
+import SaveAltIcon from "@mui/icons-material/SaveAlt";
+import Pagination from "@mui/material/Pagination";
 
 const LazyImage = lazy(() => import("./LazyImage"));
 
@@ -18,12 +22,13 @@ const UnsplashImages = () => {
   const [totalNumber, setTotalNumber] = useState(); //setting and updating total pages in api based on search
   const [input, setInput] = useState(""); //updating input value
   const [blurActive, setBlurActive] = useState(false); //setting blur when onclick
-  const [searchActive, setSearchActive] = useState(false); //searchbar active status
   const [maxImage, setMaxImage] = useState(""); //showing images of onclicked image in max view
   const [arrowActive, setArrowActive] = useState(false); //arrow setting dropdown menu
   const [hover, setHover] = useState(null); //setting hover status for images
   const [zoom, setZoom] = useState(false); //setting zoom images
   const [isLoading, setIsLoading] = useState(true); //setting skeleton before image load
+  const [like, setLike] = useState(false); //setting and updating like
+  const [bookmark, setBookmark] = useState(false); //setting and updating bookmark
 
   //fetching api for images
   useEffect(() => {
@@ -50,30 +55,30 @@ const UnsplashImages = () => {
   }, [pageNumber, input]);
 
   //for prev click
-  const prevClick = () => {
-    const total = totalNumber + 1;
-    let prev = 0;
-    if (pageNumber - 1 <= 0) {
-      console.log("n");
-    } else {
-      prev = (pageNumber - 1 + total) % total;
-      console.log(prev);
-      setPageNumber(prev);
-    }
-  };
+  // const prevClick = () => {
+  //   const total = totalNumber + 1;
+  //   let prev = 0;
+  //   if (pageNumber - 1 <= 0) {
+  //     console.log("n");
+  //   } else {
+  //     prev = (pageNumber - 1 + total) % total;
+  //     console.log(prev);
+  //     setPageNumber(prev);
+  //   }
+  // };
 
   //for next click
-  const nextClick = () => {
-    const total = totalNumber + 1;
-    let next = 0;
-    if (pageNumber + 1 >= totalNumber + 1) {
-      console.log("y");
-    } else {
-      next = (pageNumber + 1) % total;
-      console.log(next);
-      setPageNumber(next);
-    }
-  };
+  // const nextClick = () => {
+  //   const total = totalNumber + 1;
+  //   let next = 0;
+  //   if (pageNumber + 1 >= totalNumber + 1) {
+  //     console.log("y");
+  //   } else {
+  //     next = (pageNumber + 1) % total;
+  //     console.log(next);
+  //     setPageNumber(next);
+  //   }
+  // };
 
   //imageclick
   const imageClick = (image) => {
@@ -89,10 +94,6 @@ const UnsplashImages = () => {
     console.log("collection");
   };
 
-  useEffect(() => {
-    setSearchActive(input.length === 0 ? false : true);
-  }, [searchActive, input]);
-
   //tracing arrow active gsap animation
   useEffect(() => {
     if (arrowActive) {
@@ -101,6 +102,39 @@ const UnsplashImages = () => {
       gsap.to(".arrowIcon", { rotation: 0, duration: 0.5 });
     }
   }, [arrowActive]);
+
+  // Define breakpoints for skeleton width
+  const breakpoints = {
+    xs: 400,
+    sm: 600,
+    md: 900,
+    lg: 1200,
+    xl: 1536,
+  };
+
+  // Determine skeleton width based on screen size
+  const getSkeletonWidth = () => {
+    const screenWidth = window.innerWidth;
+    if (screenWidth < breakpoints.sm) {
+      return 340; // Set width for extra-small screens
+    } else if (screenWidth < breakpoints.sm) {
+      return 420; // Set width for extra-small screens
+    } else if (screenWidth < breakpoints.md) {
+      return 540; // Set width for small screens
+    } else if (screenWidth < breakpoints.lg) {
+      return 570; // Set width for medium screens
+    } else if (screenWidth < breakpoints.xl) {
+      return 650; // Set width for large screens
+    } else {
+      return 700; // Set default width for extra-large screens
+    }
+  };
+
+  //
+  const handleChangePage = (event, value) => {
+    setPageNumber(value);
+    console.log(value);
+  };
 
   return (
     <div
@@ -113,16 +147,13 @@ const UnsplashImages = () => {
           type="text"
           value={input}
           onChange={(e) => {
-            setSearchActive(true);
             setInput(e.target.value);
           }}
         />
-        {searchActive && (
-          <SearchIcon
-            className="absolute top-1/2 right-5 transform -translate-y-1/2 text-white"
-            fontSize="large"
-          />
-        )}
+        <SearchIcon
+          className="absolute top-1/2 right-5 transform -translate-y-1/2 text-white"
+          fontSize="large"
+        />
       </form>
       <div className="max-w-7xl w-full flex gap-5 justify-center flex-wrap">
         {images.map((image) => (
@@ -146,12 +177,23 @@ const UnsplashImages = () => {
             {hover === image.id && (
               <ImageOverlay handleCollection={handleCollection} />
             )}
+            <div className="sm:hidden absolute bottom-2 right-2 rounded-md w-9 h-5 flex items-center justify-center bg-white">
+              <SaveAltIcon sx={{ fontSize: "15px" }} />
+            </div>
           </div>
         ))}
       </div>
-      <div className="flex gap-2">
+      {/* <div className="flex gap-2">
         <button onClick={prevClick}>Prev</button>
         <button onClick={nextClick}>Next</button>
+      </div> */}
+      <div className="my-5">
+        <Pagination
+          count={totalNumber}
+          color="secondary"
+          page={pageNumber}
+          onChange={handleChangePage}
+        />
       </div>
       {blurActive && (
         <div
@@ -169,33 +211,62 @@ const UnsplashImages = () => {
               }}
             />
           </div>
-          <div className="bg-white max-w-5xl w-full rounded-xl h-fit p-3 flex flex-col gap-3">
-            <div className="flex gap-2 items-start">
-              <button
-                className="flex items-center gap-2 rounded-md border-gray-400 p-3"
-                style={{ borderWidth: "0.1px" }}
-              >
-                Collect <BookmarksOutlinedIcon />
-              </button>
-              <button
-                className="flex items-center gap-2 rounded-md border-gray-400 p-3 text-lg"
-                style={{ borderWidth: "0.1px" }}
-              >
-                Likes <FavoriteBorderOutlinedIcon />
-              </button>
-              <div
-                className="flex items-center justify-between rounded-md w-52 text-white"
-                style={{ backgroundColor: "#05A081" }}
-              >
-                <p className="p-3">Free Download</p>
-                <hr className="w-[1px] h-8 bg-black text-black" />
-                <div
-                  className="p-3 arrowIcon"
-                  onClick={() => {
-                    setArrowActive(!arrowActive);
-                  }}
+          <div className="bg-white max-w-5xl w-full rounded-xl h-fit p-3 flex flex-col gap-4">
+            <div className="flex gap-2 items-center justify-between">
+              <div className="flex gap-2 items-center">
+                <div className="w-12 h-12 rounded-full">
+                  <img
+                    src={maxImage.user.profile_image.large}
+                    alt="Profile"
+                    className="w-full h-full rounded-full"
+                  />
+                </div>
+                <div className="flex flex-col justify-between">
+                  <p className="font-medium text-xl">
+                    {maxImage.user.first_name} {maxImage.user.last_name}
+                  </p>
+                  <p className="text-gray-500">{maxImage.user.username}</p>
+                </div>
+              </div>
+              <div className="flex gap-2 items-center">
+                <button
+                  className="flex items-center gap-2 rounded-md border-gray-400 p-3"
+                  style={{ borderWidth: "0.1px" }}
+                  onClick={() => setBookmark(!bookmark)}
                 >
-                  <KeyboardArrowDownIcon />
+                  {bookmark ? (
+                    <BookmarksIcon sx={{ color: "blue" }} />
+                  ) : (
+                    <BookmarksOutlinedIcon />
+                  )}{" "}
+                  Collect
+                </button>
+                <button
+                  className="flex items-center gap-2 rounded-md border-gray-400 p-3 text-lg"
+                  style={{ borderWidth: "0.1px" }}
+                  onClick={() => setLike(!like)}
+                >
+                  {like ? (
+                    <FavoriteIcon sx={{ color: "red" }} />
+                  ) : (
+                    <FavoriteBorderOutlinedIcon />
+                  )}{" "}
+                  Likes <span className="text-gray-500">{maxImage.likes}</span>
+                </button>
+                <div
+                  className="flex items-center justify-between rounded-md w-52 text-white"
+                  style={{ backgroundColor: "#05A081" }}
+                >
+                  <p className="p-3">Free Download</p>
+                  <hr className="w-[1px] h-8 bg-black text-black" />
+                  <div
+                    className="p-3 arrowIcon"
+                    onClick={() => {
+                      setArrowActive(!arrowActive);
+                    }}
+                  >
+                    <KeyboardArrowDownIcon />
+                  </div>
                 </div>
               </div>
             </div>
@@ -204,18 +275,18 @@ const UnsplashImages = () => {
                 {isLoading && (
                   <Skeleton
                     variant="rectangular"
-                    width={700}
+                    width={getSkeletonWidth()}
                     height={500}
                     animation="wave"
                     className="rounded-md"
                   />
                 )}
                 <img
-                  src={maxImage.urls.full}
-                  alt=""
+                  src={maxImage.urls.regular}
+                  alt={maxImage.description}
                   className={`rounded-lg max-h-[85vh] ${
                     zoom ? "cursor-zoom-out" : "cursor-zoom-in"
-                  } ${isLoading ? "" : "block"}`}
+                  } ${isLoading ? "hidden" : "flex"}`}
                   onClick={() => setZoom(!zoom)}
                   onLoad={() => {
                     setIsLoading(false);
