@@ -1,18 +1,19 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import "tailwindcss/tailwind.css";
-import SearchIcon from "@mui/icons-material/Search";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
-import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import CloseIcon from "@mui/icons-material/Close";
-import ImageOverlay from "./ImageOverlay"; //hover image component
-import gsap from "gsap";
-import "../Home/Css/UnsplashImage.css";
+import SearchIcon from "@mui/icons-material/Search"; //icon
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"; //icon
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined"; //icon
+import FavoriteIcon from "@mui/icons-material/Favorite"; //icon
+import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined"; //icon
+import BookmarksIcon from "@mui/icons-material/Bookmarks"; //icon
+import CloseIcon from "@mui/icons-material/Close"; //icon
+import gsap from "gsap"; //motion
+import "../Home/Css/UnsplashImage.css"; //external css for scroll off
 import Skeleton from "@mui/material/Skeleton";
-import SaveAltIcon from "@mui/icons-material/SaveAlt";
+import SaveAltIcon from "@mui/icons-material/SaveAlt"; //icon
 import Pagination from "@mui/material/Pagination";
+import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded"; //icon
+import DownloadArea from "./DownloadArea"; //download dropdown
 
 const LazyImage = lazy(() => import("./LazyImage"));
 
@@ -29,6 +30,7 @@ const UnsplashImages = () => {
   const [isLoading, setIsLoading] = useState(true); //setting skeleton before image load
   const [like, setLike] = useState(false); //setting and updating like
   const [bookmark, setBookmark] = useState(false); //setting and updating bookmark
+  const [downloadActive, setDownloadActive] = useState(false); //setting download dropdown active
 
   //fetching api for images
   useEffect(() => {
@@ -82,6 +84,7 @@ const UnsplashImages = () => {
 
   //imageclick
   const imageClick = (image) => {
+    setHover(null);
     const img = new Image();
     img.src = image.urls.full; // Preload the full-sized image
     setBlurActive(true);
@@ -90,7 +93,6 @@ const UnsplashImages = () => {
 
   //collection click
   const handleCollection = () => {
-    setBlurActive(false);
     console.log("collection");
   };
 
@@ -130,10 +132,14 @@ const UnsplashImages = () => {
     }
   };
 
-  //
+  //changing pagenumber
   const handleChangePage = (event, value) => {
     setPageNumber(value);
-    console.log(value);
+  };
+
+  //updating and viewing download dropdown
+  const downloadClick = () => {
+    setDownloadActive(!downloadActive);
   };
 
   return (
@@ -148,6 +154,7 @@ const UnsplashImages = () => {
           value={input}
           onChange={(e) => {
             setInput(e.target.value);
+            setPageNumber(1);
           }}
         />
         <SearchIcon
@@ -160,6 +167,8 @@ const UnsplashImages = () => {
           <div
             className="relative w-40 sx:w-44 mdd:w-60 lg:w-80 xl:w-96"
             key={image.id}
+            onMouseEnter={() => setHover(image.id)}
+            onMouseLeave={() => setHover(null)}
           >
             <Suspense fallback={<div>Loading...</div>}>
               <a href={image.urls.small} onClick={(e) => e.preventDefault()}>
@@ -168,14 +177,42 @@ const UnsplashImages = () => {
                   src={image.urls.small}
                   alt={image.alt_description}
                   onClick={() => imageClick(image)}
-                  onMouseEnter={() => setHover(image.id)}
-                  onMouseLeave={() => setHover(null)}
                   className="w-full h-full cursor-pointer"
                 />
               </a>
             </Suspense>
             {hover === image.id && (
-              <ImageOverlay handleCollection={handleCollection} />
+              <button
+                className="hidden md:flex absolute top-4 right-16 z-10 w-10 h-10 rounded-lg bg-white justify-center items-center cursor-default"
+                onClick={() => {
+                  handleCollection();
+                }}
+              >
+                <BookmarksOutlinedIcon />
+              </button>
+            )}
+            {hover === image.id && (
+              <button
+                className="hidden md:flex absolute top-4 right-4 z-10 w-10 h-10 rounded-lg bg-white justify-center items-center cursor-default"
+                onClick={() => {
+                  handleCollection();
+                }}
+              >
+                <FavoriteBorderOutlinedIcon />
+              </button>
+            )}
+            {hover === image.id && (
+              <div
+                className={`hidden md:flex absolute bottom-4 right-4 z-10 items-center justify-center rounded-full w-40 text-white cursor-default`}
+                style={{ backgroundColor: "#048369" }}
+              >
+                <button
+                  className="p-3 flex gap-2 items-center justify-center cursor-default"
+                  onClick={() => imageClick(image)}
+                >
+                  Download <FileDownloadRoundedIcon />
+                </button>
+              </div>
             )}
             <div className="sm:hidden absolute bottom-2 right-2 rounded-md w-9 h-5 flex items-center justify-center bg-white">
               <SaveAltIcon sx={{ fontSize: "15px" }} />
@@ -195,6 +232,7 @@ const UnsplashImages = () => {
           onChange={handleChangePage}
         />
       </div>
+      {/* blur active */}
       {blurActive && (
         <div
           className="w-full h-full fixed top-0 right-0 left-0 bottom-0 py-5 px-2 flex flex-col items-center overflow-y-auto hide-scrollbar"
@@ -206,8 +244,10 @@ const UnsplashImages = () => {
               sx={{ fontSize: "40px", color: "white" }}
               onClick={() => {
                 setZoom(false);
-                setBlurActive(false);
-                setIsLoading(true);
+                setBlurActive(false); //closing the bluractive
+                setIsLoading(true); // activating the skeleton for next image
+                setDownloadActive(false); //deactivating the dwonload dropdown
+                setArrowActive(false); //returning the arrow to original position
               }}
             />
           </div>
@@ -254,8 +294,9 @@ const UnsplashImages = () => {
                   Likes <span className="text-gray-500">{maxImage.likes}</span>
                 </button>
                 <div
-                  className="flex items-center justify-between rounded-md w-52 text-white"
+                  className="flex items-center justify-between rounded-md w-52 text-white relative"
                   style={{ backgroundColor: "#05A081" }}
+                  onClick={downloadClick}
                 >
                   <p className="p-3">Free Download</p>
                   <hr className="w-[1px] h-8 bg-black text-black" />
@@ -267,6 +308,7 @@ const UnsplashImages = () => {
                   >
                     <KeyboardArrowDownIcon />
                   </div>
+                  {downloadActive && <DownloadArea />}
                 </div>
               </div>
             </div>
