@@ -31,10 +31,11 @@ const UnsplashImages = () => {
   const [like, setLike] = useState(false); //setting and updating like
   const [bookmark, setBookmark] = useState(false); //setting and updating bookmark
   const [downloadActive, setDownloadActive] = useState(false); //setting download dropdown active
+  const [isscrolled, setisscrolled] = useState(false);
 
   //fetching api for images
   useEffect(() => {
-    const fetchImages = async (page = pageNumber, perPage = 21) => {
+    const fetchImages = async (page = pageNumber, perPage = 30) => {
       try {
         const response = await fetch(
           `https://api.unsplash.com/search/photos/?client_id=oCWdYYvYZwAIRfOW7O9pBKpPKVsaPpayb8VEqYolSQU&page=${page}&per_page=${perPage}&query=${input}`
@@ -142,15 +143,47 @@ const UnsplashImages = () => {
     setDownloadActive(!downloadActive);
   };
 
+  //checking for top scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      if (scrollTop > 90) {
+        setisscrolled(true);
+      } else {
+        setisscrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  });
+
+  //setting main scroll of when bluractive
+  useEffect(() => {
+    if (blurActive) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [blurActive]);
+
   return (
     <div
       className="flex flex-col items-center justify-center font-Tilt-Neon px-3"
       style={{ minHeight: "80vh" }}
     >
-      <form className="max-w-7xl w-full my-3 relative">
+      <form className={`sticky top-5 z-10 max-w-7xl w-full my-3 `}>
         <input
-          className="w-full p-3 outline-none border-2 border-blue-400 rounded-full bg-sky-950 px-7 text-white"
+          className={`w-full p-3 outline-none border-2 rounded-full px-7  ${
+            isscrolled
+              ? "bg-white text-blue-400 border-blue-400"
+              : "border-blue-400 bg-sky-950 text-white"
+          }`}
           type="text"
+          placeholder="search picture what you want"
           value={input}
           onChange={(e) => {
             setInput(e.target.value);
@@ -158,7 +191,9 @@ const UnsplashImages = () => {
           }}
         />
         <SearchIcon
-          className="absolute top-1/2 right-5 transform -translate-y-1/2 text-white"
+          className={`absolute top-1/2 right-5 transform -translate-y-1/2 ${
+            isscrolled ? "text-blue-400" : "text-white"
+          }`}
           fontSize="large"
         />
       </form>
@@ -183,7 +218,7 @@ const UnsplashImages = () => {
             </Suspense>
             {hover === image.id && (
               <button
-                className="hidden md:flex absolute top-4 right-16 z-10 w-10 h-10 rounded-lg bg-white justify-center items-center cursor-default"
+                className="hidden md:flex absolute top-4 right-16 z-1 w-10 h-10 rounded-lg bg-white justify-center items-center cursor-default"
                 onClick={() => {
                   handleCollection();
                 }}
@@ -193,7 +228,7 @@ const UnsplashImages = () => {
             )}
             {hover === image.id && (
               <button
-                className="hidden md:flex absolute top-4 right-4 z-10 w-10 h-10 rounded-lg bg-white justify-center items-center cursor-default"
+                className="hidden md:flex absolute top-4 right-4 z-1 w-10 h-10 rounded-lg bg-white justify-center items-center cursor-default"
                 onClick={() => {
                   handleCollection();
                 }}
@@ -203,7 +238,7 @@ const UnsplashImages = () => {
             )}
             {hover === image.id && (
               <div
-                className={`hidden md:flex absolute bottom-4 right-4 z-10 items-center justify-center rounded-full w-40 text-white cursor-default`}
+                className={`hidden md:flex absolute bottom-4 right-4 z-1 items-center justify-center rounded-full w-40 text-white cursor-default`}
                 style={{ backgroundColor: "#048369" }}
               >
                 <button
@@ -235,8 +270,8 @@ const UnsplashImages = () => {
       {/* blur active */}
       {blurActive && (
         <div
-          className="w-full h-full fixed top-0 right-0 left-0 bottom-0 py-5 px-2 flex flex-col items-center overflow-y-auto hide-scrollbar"
-          style={{ backgroundColor: "rgba(109, 107, 107, 0.219)" }}
+          className="w-full h-full fixed top-0 right-0 left-0 z-20 bottom-0 py-5 px-2 flex flex-col items-center overflow-y-auto hide-scrollbar"
+          style={{ backgroundColor: "rgba(31, 30, 30, 0.801)" }}
         >
           <div className="max-w-5xl w-full flex justify-end">
             <CloseIcon
@@ -254,7 +289,7 @@ const UnsplashImages = () => {
           <div className="bg-white max-w-5xl w-full rounded-xl h-fit p-3 flex flex-col gap-4">
             <div className="flex gap-2 items-center justify-between">
               <div className="flex gap-2 items-center">
-                <div className="w-12 h-12 rounded-full">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full">
                   <img
                     src={maxImage.user.profile_image.large}
                     alt="Profile"
@@ -262,10 +297,12 @@ const UnsplashImages = () => {
                   />
                 </div>
                 <div className="flex flex-col justify-between">
-                  <p className="font-medium text-xl">
+                  <p className="font-medium text-base sm:text-xl">
                     {maxImage.user.first_name} {maxImage.user.last_name}
                   </p>
-                  <p className="text-gray-500">{maxImage.user.username}</p>
+                  <p className="text-gray-500 text-sm sm:text-base">
+                    {maxImage.user.username}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-2 items-center relative">
@@ -279,7 +316,7 @@ const UnsplashImages = () => {
                   ) : (
                     <BookmarksOutlinedIcon />
                   )}{" "}
-                  Collect
+                  <span className="hidden md:flex">Collect</span>
                 </button>
                 <button
                   className="flex items-center gap-2 rounded-md border-gray-400 p-3 text-lg"
@@ -291,10 +328,11 @@ const UnsplashImages = () => {
                   ) : (
                     <FavoriteBorderOutlinedIcon />
                   )}{" "}
-                  Likes <span className="text-gray-500">{maxImage.likes}</span>
+                  <span className="hidden md:flex">Likes</span>{" "}
+                  <span className="text-gray-500">{maxImage.likes}</span>
                 </button>
                 <div
-                  className="flex items-center justify-between rounded-md w-52 text-white"
+                  className="hidden sm:flex items-center justify-between rounded-md w-52 text-white"
                   style={{ backgroundColor: "#05A081" }}
                   onClick={downloadClick}
                 >
@@ -335,6 +373,22 @@ const UnsplashImages = () => {
                   }}
                 />
               </Suspense>
+            </div>
+            <div
+              className="self-center flex sm:hidden mt-10 sm:mt-0 items-center justify-between rounded-md w-52 text-white"
+              style={{ backgroundColor: "#05A081" }}
+              onClick={downloadClick}
+            >
+              <p className="p-3">Free Download</p>
+              <hr className="w-[1px] h-8 bg-black text-black" />
+              <div
+                className="p-3 arrowIcon"
+                onClick={() => {
+                  setArrowActive(!arrowActive);
+                }}
+              >
+                <KeyboardArrowDownIcon />
+              </div>
             </div>
           </div>
         </div>
