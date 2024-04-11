@@ -99,9 +99,9 @@ const UnsplashImages = () => {
   //tracing arrow active gsap animation
   useEffect(() => {
     if (arrowActive) {
-      gsap.to(".arrowIcon", { rotation: 180, duration: 0.5 });
+      gsap.to(".arrowIcon", { rotation: 180, duration: 0.3 });
     } else {
-      gsap.to(".arrowIcon", { rotation: 0, duration: 0.5 });
+      gsap.to(".arrowIcon", { rotation: 0, duration: 0.3 });
     }
   }, [arrowActive]);
 
@@ -268,7 +268,7 @@ const UnsplashImages = () => {
                   <p className="text-gray-500">{maxImage.user.username}</p>
                 </div>
               </div>
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center relative">
                 <button
                   className="flex items-center gap-2 rounded-md border-gray-400 p-3"
                   style={{ borderWidth: "0.1px" }}
@@ -294,7 +294,7 @@ const UnsplashImages = () => {
                   Likes <span className="text-gray-500">{maxImage.likes}</span>
                 </button>
                 <div
-                  className="flex items-center justify-between rounded-md w-52 text-white relative"
+                  className="flex items-center justify-between rounded-md w-52 text-white"
                   style={{ backgroundColor: "#05A081" }}
                   onClick={downloadClick}
                 >
@@ -308,8 +308,8 @@ const UnsplashImages = () => {
                   >
                     <KeyboardArrowDownIcon />
                   </div>
-                  {downloadActive && <DownloadArea />}
                 </div>
+                {downloadActive && <DownloadArea image={maxImage} />}
               </div>
             </div>
             <div className="self-center" key={maxImage.id}>
