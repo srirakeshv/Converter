@@ -14,6 +14,7 @@ import SaveAltIcon from "@mui/icons-material/SaveAlt"; //icon
 import Pagination from "@mui/material/Pagination";
 import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded"; //icon
 import DownloadArea from "./DownloadArea"; //download dropdown
+import { Collection } from "../Collection/CollectionProvider";
 
 const LazyImage = lazy(() => import("./LazyImage"));
 
@@ -32,6 +33,7 @@ const UnsplashImages = () => {
   const [bookmark, setBookmark] = useState(false); //setting and updating bookmark
   const [downloadActive, setDownloadActive] = useState(false); //setting download dropdown active
   const [isscrolled, setisscrolled] = useState(false);
+  const { addToCollection } = Collection();
 
   //fetching api for images
   useEffect(() => {
@@ -93,8 +95,9 @@ const UnsplashImages = () => {
   };
 
   //collection click
-  const handleCollection = () => {
+  const handleCollection = (collectImg) => {
     console.log("collection");
+    addToCollection(collectImg);
   };
 
   //tracing arrow active gsap animation
@@ -220,7 +223,7 @@ const UnsplashImages = () => {
               <button
                 className="hidden md:flex absolute top-4 right-16 z-1 w-10 h-10 rounded-lg bg-white justify-center items-center cursor-default"
                 onClick={() => {
-                  handleCollection();
+                  handleCollection(image);
                 }}
               >
                 <BookmarksOutlinedIcon />
@@ -229,9 +232,9 @@ const UnsplashImages = () => {
             {hover === image.id && (
               <button
                 className="hidden md:flex absolute top-4 right-4 z-1 w-10 h-10 rounded-lg bg-white justify-center items-center cursor-default"
-                onClick={() => {
-                  handleCollection();
-                }}
+                // onClick={() => {
+                //   handleCollection();
+                // }}
               >
                 <FavoriteBorderOutlinedIcon />
               </button>
