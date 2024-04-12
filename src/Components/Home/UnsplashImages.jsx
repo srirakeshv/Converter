@@ -33,7 +33,8 @@ const UnsplashImages = () => {
   const [bookmark, setBookmark] = useState(false); //setting and updating bookmark
   const [downloadActive, setDownloadActive] = useState(false); //setting download dropdown active
   const [isscrolled, setisscrolled] = useState(false);
-  const { addToCollection } = Collection();
+  const [bookmark1, setBookmark1] = useState({});
+  const { addToCollection, collectImage, setCollectImage } = Collection();
 
   //fetching api for images
   useEffect(() => {
@@ -96,8 +97,22 @@ const UnsplashImages = () => {
 
   //collection click
   const handleCollection = (collectImg) => {
-    console.log("collection");
+    // console.log("collection");
     addToCollection(collectImg);
+    // Toggle the collection status based on bookmark1
+    if (bookmark1[collectImg.id]) {
+      // If bookmark1 is true for this image, remove it from the collection
+      setCollectImage((prevCollection) =>
+        prevCollection.filter((img) => img.id !== collectImg.id)
+      );
+    } else {
+      // If bookmark1 is false or undefined for this image, add it to the collection
+      setCollectImage([...collectImage, collectImg]);
+    }
+    setBookmark1((prevBookmarks) => ({
+      ...prevBookmarks,
+      [collectImg.id]: !prevBookmarks[collectImg.id],
+    }));
   };
 
   //tracing arrow active gsap animation
@@ -226,7 +241,11 @@ const UnsplashImages = () => {
                   handleCollection(image);
                 }}
               >
-                <BookmarksOutlinedIcon />
+                {bookmark1[image.id] ? (
+                  <BookmarksIcon sx={{ color: "blue" }} />
+                ) : (
+                  <BookmarksOutlinedIcon />
+                )}
               </button>
             )}
             {hover === image.id && (
@@ -312,9 +331,9 @@ const UnsplashImages = () => {
                 <button
                   className="flex items-center gap-2 rounded-md border-gray-400 p-3"
                   style={{ borderWidth: "0.1px" }}
-                  onClick={() => setBookmark(!bookmark)}
+                  onClick={() => handleCollection(maxImage)}
                 >
-                  {bookmark ? (
+                  {bookmark1[maxImage.id] ? (
                     <BookmarksIcon sx={{ color: "blue" }} />
                   ) : (
                     <BookmarksOutlinedIcon />

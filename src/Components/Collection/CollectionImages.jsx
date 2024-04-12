@@ -6,16 +6,16 @@ const CollectionImages = () => {
   const { collectImage } = Collection() || { collectImg: [] };
   return (
     <div className="flex justify-center font-Tilt-Neon mt-10">
-      <div className="max-w-7xl w-full">
-        <ul className="flex gap-3 items-center text-2xl text-white">
+      <div className="max-w-7xl w-full px-2">
+        <ul className="flex gap-3 items-center text-base sm:text-2xl text-white">
           <li className="p-2 px-6 rounded-full bg-blue-500 flex gap-2 items-center">
             Collections{" "}
             <span className="text-gray-300">{collectImage.length}</span>
           </li>
-          <li className="p-2 px-6 flex gap-2 items-center">
+          <li className="flex gap-2 items-center">
             Followers <span className="text-gray-300">0</span>
           </li>
-          <li className="p-2 px-6 flex gap-2 items-center">
+          <li className="flex gap-2 items-center">
             Following <span className="text-gray-300">0</span>
           </li>
         </ul>

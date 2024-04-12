@@ -10,7 +10,9 @@ export const CollectionProvider = ({ children }) => {
     setCollectImage([...collectImage, collectImg]);
   };
   return (
-    <CollectionContext.Provider value={{ collectImage, addToCollection }}>
+    <CollectionContext.Provider
+      value={{ collectImage, addToCollection, setCollectImage }}
+    >
       {children}
     </CollectionContext.Provider>
   );
