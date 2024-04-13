@@ -8,7 +8,7 @@ In the project directory, you can run:
 
 ## About This Website
 
-This is image search website platform and this runs on `unsplash api` request with basic collections alone.
+This is image search website platform and this runs on `unsplash api` request with basic collections alone.\
 No download funstionality is available since the api prevents from that request
 
 ### `npm start`
