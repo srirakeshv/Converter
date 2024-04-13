@@ -218,7 +218,7 @@ const UnsplashImages = () => {
       <div className="max-w-7xl w-full flex gap-5 justify-center flex-wrap">
         {images.map((image) => (
           <div
-            className="relative w-40 sx:w-44 mdd:w-60 lg:w-80 xl:w-96"
+            className="relative w-28 sxxx:w-32 sxx:w-40 sx:w-44 mdd:w-60 lg:w-80 xl:w-96"
             key={image.id}
             onMouseEnter={() => setHover(image.id)}
             onMouseLeave={() => setHover(null)}

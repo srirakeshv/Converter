@@ -7,6 +7,8 @@ module.exports = {
         "Tilt-Neon": ["Tilt Neon", "sans-serif"],
       },
       screens: {
+        sxxx: "300px",
+        sxx: "370px",
         sx: "450px",
         mdd: "770px",
       },
