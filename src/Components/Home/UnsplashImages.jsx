@@ -369,7 +369,9 @@ const UnsplashImages = () => {
                     <KeyboardArrowDownIcon />
                   </div>
                 </div>
-                {downloadActive && <DownloadArea image={maxImage} />}
+                {downloadActive && (
+                  <DownloadArea arrowActive={arrowActive} image={maxImage} />
+                )}
               </div>
             </div>
             <div className="self-center" key={maxImage.id}>
