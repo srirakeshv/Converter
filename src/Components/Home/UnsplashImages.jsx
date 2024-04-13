@@ -49,7 +49,7 @@ const UnsplashImages = () => {
         }
 
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         setImages(data.results);
         setTotalNumber(data.total_pages);
       } catch (error) {
